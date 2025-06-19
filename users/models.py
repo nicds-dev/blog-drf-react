@@ -1,17 +1,10 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
-from django.core.exceptions import ValidationError
 from django.utils import timezone
 
 
 class CustomUserManager(BaseUserManager):
     def create_user(self, email, username, first_name, password=None, **extra_fields):
-        if not email:
-            raise ValueError('Email field is required.')
-        if not username:
-            raise ValueError('Username field is required.')
-        if not first_name:
-            raise ValueError('First Name field is required.')
 
         email = self.normalize_email(email)
         user = self.model(email=email, username=username, first_name=first_name, **extra_fields)
@@ -53,8 +46,8 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
         return f'@{self.username}'
 
     class Meta:
-        verbose_name = 'user'
-        verbose_name_plural = 'users'
+        verbose_name = 'User'
+        verbose_name_plural = 'Users'
 
 
 class Follow(models.Model):
@@ -70,7 +63,3 @@ class Follow(models.Model):
 
     def __str__(self):
         return f'{self.follower} follows {self.following}'
-
-    def clean(self):
-        if self.follower == self.following:
-            raise ValidationError('Users cannot follow themselves.')

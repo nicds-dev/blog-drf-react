@@ -1,8 +1,14 @@
 from django.contrib.auth.password_validation import validate_password
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
-from .models import CustomUser
+from .models import CustomUser, Follow
 import re
+
+
+def is_followed_by(request_user, target_user):
+    if request_user and request_user.is_authenticated:
+        return Follow.objects.filter(follower=request_user, following=target_user).exists()
+    return False
 
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
@@ -14,7 +20,7 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         return token
 
 
-class UserSerializer(serializers.ModelSerializer):
+class UserProfileSerializer(serializers.ModelSerializer):
     followers_count = serializers.SerializerMethodField()
     following_count = serializers.SerializerMethodField()
     posts_count = serializers.SerializerMethodField()
@@ -38,13 +44,27 @@ class UserSerializer(serializers.ModelSerializer):
 
     def get_posts_count(self, obj):
         # TODO:
-        return 0
+        return None
 
     def get_is_followed(self, obj):
-        request = self.context.get('request', None)
-        if request and request.user.is_authenticated:
-            return obj.followers.filter(id=request.user.id).exists()
-        return False
+       return is_followed_by(self.context.get('request').user, obj)
+
+
+class UserSerializer(serializers.ModelSerializer):
+    full_name = serializers.SerializerMethodField()
+    is_followed = serializers.SerializerMethodField()
+
+    class Meta:
+        model = CustomUser
+        fields = ['id', 'username', 'full_name', 'avatar', 'is_followed']
+
+    def get_full_name(self, obj):
+        if obj.first_name and obj.last_name:
+            return f'{obj.first_name} {obj.last_name}'.strip()
+        return obj.first_name
+
+    def get_is_followed(self, obj):
+        return is_followed_by(self.context.get('request').user, obj)
 
 
 class SignUpSerializer(serializers.ModelSerializer):
