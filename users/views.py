@@ -6,8 +6,9 @@ from rest_framework.exceptions import NotFound
 
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from .models import CustomUser, Follow
-from .serializers import SignUpSerializer, UserProfileSerializer, UserSerializer
+from .models import CustomUser
+from .serializers import SignUpSerializer, UserProfileSerializer, UserSerializer, UpdateUserSerializer, ChangePasswordSerializer
+from .services.follow_service import toggle_follow
 
 
 class SignUpView(generics.CreateAPIView):
@@ -37,7 +38,7 @@ class UserDetailView(generics.RetrieveAPIView):
 
 
 class UpdateProfileView(generics.RetrieveUpdateAPIView):
-    serializer_class = UserProfileSerializer
+    serializer_class = UpdateUserSerializer
     permission_classes = [permissions.IsAuthenticated]
     
     def get_object(self):
@@ -45,24 +46,44 @@ class UpdateProfileView(generics.RetrieveUpdateAPIView):
         return self.request.user
 
 
+class ChangePasswordView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request):
+        serializer = ChangePasswordSerializer(data=request.data, context={'request': request})
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response({'detail': 'Password updated successfully.'}, status=status.HTTP_200_OK)
+
+
+class DeleteAccountView(generics.DestroyAPIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_object(self):
+        return self.request.user
+
+    def delete(self, request, *args, **kwargs):
+        user = self.get_object()
+
+        try:
+            user.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+
+        except Exception:
+           return Response({'detail': 'An unexpected error occurred while deleting the account.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
 class ToggleFollowView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request, username):
-        current_user = request.user
-        target_user = get_object_or_404(CustomUser, username=username)
+        result, is_following = toggle_follow(request.user, username)
 
-        if current_user == target_user:
-            return Response({'detail': 'You cannot follow yourself.'}, status=status.HTTP_400_BAD_REQUEST)
+        if 'error' in result:
+            return Response({'detail': result['error']}, status=status.HTTP_400_BAD_REQUEST)
 
-        relation = Follow.objects.filter(follower=current_user, following=target_user)
-
-        if relation.exists():
-            relation.delete()
-            return Response({'detail': f'You unfollowed @{target_user.username}', 'is_following': False}, status=status.HTTP_200_OK)
-        else:
-            Follow.objects.create(follower=current_user, following=target_user)
-            return Response({'detail': f'You followed @{target_user.username}', 'is_following': True}, status=status.HTTP_201_CREATED)
+        return Response({**result, 'is_following': is_following},
+                        status=status.HTTP_201_CREATED if is_following else status.HTTP_200_OK)
 
 
 class FollowersListView(generics.ListAPIView):

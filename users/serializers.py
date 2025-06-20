@@ -20,6 +20,27 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         return token
 
 
+class SignUpSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(write_only=True, validators=[validate_password])
+
+    class Meta:
+        model = CustomUser
+        fields = ['email', 'username', 'first_name', 'password']
+
+    def validate_username(self, value):
+        value = value.lower()
+        if not re.match(r'^[\w]+$', value):  # Regular expression: letters, numbers and underscores
+            raise serializers.ValidationError('Only letters, numbers and underscores(_) are allowed in the username.')
+        return value
+
+    def create(self, validated_data):
+        password = validated_data.pop('password')
+        instance = CustomUser(**validated_data)
+        instance.set_password(password)
+        instance.save()
+        return instance
+
+
 class UserProfileSerializer(serializers.ModelSerializer):
     followers_count = serializers.SerializerMethodField()
     following_count = serializers.SerializerMethodField()
@@ -43,8 +64,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
         return obj.following.count()
 
     def get_posts_count(self, obj):
-        # TODO:
-        return None
+        return obj.posts.count()
 
     def get_is_followed(self, obj):
        return is_followed_by(self.context.get('request').user, obj)
@@ -57,6 +77,7 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
         fields = ['id', 'username', 'full_name', 'avatar', 'is_followed']
+        read_only_fields = ['id', 'is_followed']
 
     def get_full_name(self, obj):
         if obj.first_name and obj.last_name:
@@ -67,22 +88,30 @@ class UserSerializer(serializers.ModelSerializer):
         return is_followed_by(self.context.get('request').user, obj)
 
 
-class SignUpSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(write_only=True, validators=[validate_password])
-
+class UpdateUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
-        fields = ['email', 'username', 'first_name', 'password']
+        fields = ['username', 'first_name', 'last_name', 'bio', 'avatar']
 
-    def validate_username(self, value):
-        value = value.lower()
-        if not re.match(r'^[\w]+$', value):  # Regular expression: letters, numbers and underscores
-            raise serializers.ValidationError('Only letters, numbers and underscores(_) are allowed in the username.')
+
+class ChangePasswordSerializer(serializers.Serializer):
+    old_password = serializers.CharField(write_only=True)
+    new_password = serializers.CharField(write_only=True, validators=[validate_password])
+
+    def validate_old_password(self, value):
+        user = self.context['request'].user
+        if not user.check_password(value):
+            raise serializers.ValidationError('Old password is not correct.')
         return value
 
-    def create(self, validated_data):
-        password = validated_data.pop('password')
-        instance = CustomUser(**validated_data)
-        instance.set_password(password)
-        instance.save()
-        return instance
+    def validate(self, attrs):
+        user = self.context['request'].user
+        if user.check_password(attrs['new_password']):
+            raise serializers.ValidationError({'new_password': 'New password cannot be the same as the old password.'})
+        return attrs
+
+    def save(self, **kawrgs):
+        user = self.context['request'].user
+        user.set_password(self.validated_data['new_password'])
+        user.save()
+        return user
