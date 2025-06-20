@@ -38,7 +38,7 @@ THIRD_APPS = [
 ]
 
 LOCAL_APPS = [
-    'blog',
+    'posts',
     'users',
 ]
 
