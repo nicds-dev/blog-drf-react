@@ -39,7 +39,7 @@ class PostLikesListView(generics.ListAPIView):
     def get_queryset(self):
         slug = self.kwargs['slug']
         post = get_object_or_404(Post, slug=slug)
-        return CustomUser.objects.filter(likes__post=post)
+        return CustomUser.objects.filter(likes__post=post)('-likes__created_at')
 
 
 class FeaturedPostView(generics.RetrieveAPIView):
@@ -124,12 +124,19 @@ class ToggleLikeView(APIView):
 
     def post(self, request, slug):
         post = get_object_or_404(Post, slug=slug)
-
         like = Like.objects.filter(user=request.user, post=post)
 
         if like.exists():
             like.delete()
-            return Response({'detail': 'Like removed', 'is_liked': False}, status=status.HTTP_200_OK)
+            is_liked = False
+
         else:
             Like.objects.create(user=request.user, post=post)
-            return Response({'detail': 'Post liked', 'is_liked': True}, status=status.HTTP_201_CREATED)
+            is_liked = True
+
+        return Response({
+            'detail': 'Post liked',
+            'is_liked': is_liked,
+            'likes_count': post.likes.count()
+            }, status=status.HTTP_201_CREATED
+        )

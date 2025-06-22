@@ -33,6 +33,9 @@ class SignUpSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError('Only letters, numbers and underscores(_) are allowed in the username.')
         return value
 
+    def validate_email(self, value):
+        return value.lower()
+
     def create(self, validated_data):
         password = validated_data.pop('password')
         instance = CustomUser(**validated_data)
@@ -110,7 +113,7 @@ class ChangePasswordSerializer(serializers.Serializer):
             raise serializers.ValidationError({'new_password': 'New password cannot be the same as the old password.'})
         return attrs
 
-    def save(self, **kawrgs):
+    def save(self, **kwargs):
         user = self.context['request'].user
         user.set_password(self.validated_data['new_password'])
         user.save()

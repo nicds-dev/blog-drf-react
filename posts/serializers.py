@@ -23,6 +23,9 @@ class HashtagSerializer(serializers.ModelSerializer):
         fields = ['id', 'name']
         read_only_fields = ['id']
 
+    def validate_name(self, value):
+        return value.lower()
+
 
 class LikeSerializer(serializers.ModelSerializer):
     user = UserSerializer(read_only=True)
