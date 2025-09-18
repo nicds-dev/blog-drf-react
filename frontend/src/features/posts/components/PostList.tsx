@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react"
+import { NavLink } from "react-router-dom"
 import type { Post } from "@/types/post"
 import { getPosts } from "../services"
 import { Button } from "@/components/ui/button"
@@ -18,10 +19,10 @@ export default function PostList() {
         <header className="mb-8 flex justify-between">
           <h2 className="text-3xl font-bold">Recent Posts</h2>
           <Button asChild variant="ghost" className="group">
-            <a href="/explore" className="flex items-center">
+            <NavLink to="/explore" className="flex items-center">
               View all
               <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
-            </a>
+            </NavLink>
           </Button>
         </header>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

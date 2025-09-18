@@ -1,3 +1,4 @@
+import { NavLink } from "react-router-dom"
 import { Button } from "@/components/ui/button"
 
 export default function Header() {
@@ -11,10 +12,10 @@ export default function Header() {
       </p>
       <div className="flex flex-wrap justify-center gap-4">
         <Button asChild size="lg">
-          <a href="/create">Create a post</a>
+          <NavLink to="/create">Create a post</NavLink>
         </Button>
         <Button asChild variant="outline" size="lg">
-          <a href="/explore">Explore posts</a>
+          <NavLink to="/explore">Explore posts</NavLink>
         </Button>
       </div>
     </section>

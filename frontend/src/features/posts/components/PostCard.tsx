@@ -25,15 +25,18 @@ export default function PostCard({ post, variant = "list" }: PostCardProps) {
       className={`overflow-hidden flex flex-col h-full p-0 gap-0 ${isFeatured ? "md:flex-row border-0" : "border"}`}
     >
       {/* Image */}
-      <NavLink
+      <div className={`relative overflow-hidden ${isFeatured && "md:w-1/2"}`}>
+        <NavLink
         to={`/post/${post.slug}`}
-        className={`relative overflow-hidden ${isFeatured ? "md:w-1/2 aspect-[16/9]" : "aspect-[16/9]"}`}
-      >
-        <img
-          src={post.image || "https://cdn.pixabay.com/photo/2023/03/16/08/42/camping-7856198_640.jpg"}
-          alt={post.title}
-          className="object-cover w-full h-full transition-transform hover:scale-105 duration-500"
-        />
+        className={`${isFeatured ? "md:w-1/2 aspect-[16/9]" : "aspect-[16/9]"}`}
+        >
+          <img
+            src={post.image || "https://cdn.pixabay.com/photo/2023/03/16/08/42/camping-7856198_640.jpg"}
+            alt={post.title}
+            className="object-cover w-full h-full transition-transform hover:scale-105 duration-500"
+          />
+        </NavLink>
+
         {post.category && (
           <div className="absolute top-3 left-3">
             <NavLink
@@ -44,7 +47,7 @@ export default function PostCard({ post, variant = "list" }: PostCardProps) {
             </NavLink>
           </div>
         )}
-      </NavLink>
+      </div>
 
       {/* Content */}
       <CardContent className={`flex flex-col flex-1 ${isFeatured ? "p-6 md:p-8 md:w-1/2" : "p-6"}`}>

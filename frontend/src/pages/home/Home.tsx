@@ -1,6 +1,7 @@
+import Header from "@/pages/home/HomeHeader"
 import FeaturedPost from "@/features/posts/components/FeaturedPost"
 import PostList from "@/features/posts/components/PostList"
-import Header from "@/pages/home/HomeHeader"
+import Footer from "@/pages/home/HomeFooter"
 
 export default function HomePage() {
   return (
@@ -8,6 +9,7 @@ export default function HomePage() {
       <Header />
       <FeaturedPost />
       <PostList />
+      <Footer />
     </main>
   )
 }
