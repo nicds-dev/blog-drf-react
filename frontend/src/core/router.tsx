@@ -9,6 +9,7 @@ export default function AppRouter() {
       <Route element={<MainLayout />}>
         <Route index element={<HomePage />} />
         <Route path="/explore" element={<ExplorePage />} />
+        <Route path="/explore/:category" element={<ExplorePage />} />
       </Route>
     </Routes>
   )

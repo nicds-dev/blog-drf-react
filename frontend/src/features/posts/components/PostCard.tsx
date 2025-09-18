@@ -40,7 +40,7 @@ export default function PostCard({ post, variant = "list" }: PostCardProps) {
         {post.category && (
           <div className="absolute top-3 left-3">
             <NavLink
-              to={`/category/${post.category.slug}`}
+              to={`/explore/${post.category.slug}`}
               className="tag-badge bg-black/50 backdrop-blur-sm hover:bg-blue-500 transition-colors"
             >
               {post.category.name}
