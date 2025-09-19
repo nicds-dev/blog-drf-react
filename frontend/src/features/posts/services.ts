@@ -7,8 +7,20 @@ export const getFeaturedPost = async (): Promise<Post> => {
   return response.data
 }
 
-export const getPosts = async (category: string = "all"): Promise<Post[]> => {
-  const url = category === "all" ? "/posts/" : `/posts/?category=${category}`
+export const getPosts = async (
+  category: string = "all", 
+  search: string = ""
+): Promise<Post[]> => {
+  const params = new URLSearchParams()
+
+  if (category !== "all") {
+    params.append("category", category)
+  }
+  if (search.trim()) {
+    params.append("search", search.trim())
+  }
+
+  const url = `/posts/${params.toString() ? `?${params.toString()}` : ""}`
 
   const response = await api.get(url)
   return response.data.results ?? response.data // paginación futura

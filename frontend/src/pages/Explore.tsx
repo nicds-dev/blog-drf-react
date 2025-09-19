@@ -9,8 +9,11 @@ export default function ExplorePage() {
   const { category } = useParams()
   const navigate = useNavigate()
 
+  const params = new URLSearchParams(location.search)
+  const search = params.get("search") || ""
+
   const currentCategory = category  || "all"
-  const { posts, loading, error } = usePosts(currentCategory)
+  const { posts, loading, error } = usePosts(currentCategory, search)
 
   const handleCategoryChange = (newCategory: string) => {
     if (newCategory === "all") {

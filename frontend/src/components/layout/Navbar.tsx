@@ -1,9 +1,8 @@
 import { NavLink } from "react-router-dom"
-import { useState } from "react"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Search, PlusSquare } from "lucide-react"
+import { PlusSquare, User } from "lucide-react"
 import NavLinks from "@/components/layout/NavLinks"
+import SearchBar from "@/components/layout/SearchBar"
 
 interface User {
   name: string
@@ -12,8 +11,6 @@ interface User {
 }
 
 export default function Navbar() {
-  const [searchQuery, setSearchQuery] = useState<string>("")
-
   const user = null
 
   return (
@@ -26,19 +23,7 @@ export default function Navbar() {
           <NavLinks />
         </div>
         <div className="flex items-center gap-4">
-          <form className="hidden md:flex relative">
-            <Input
-              type="search"
-              placeholder="Search posts..."
-              className="w-[200px] lg:w-[300px]"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-            <Button type="submit" variant="ghost" size="icon" className="absolute right-0 top-0 h-full w-10">
-              <Search className="h-4 w-4" />
-              <span className="sr-only">Search</span>
-            </Button>
-          </form>
+          <SearchBar />
 
           {user ? (
             <>
