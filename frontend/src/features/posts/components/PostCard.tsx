@@ -3,7 +3,7 @@ import type { Post } from "@/types/post"
 import { Card, CardContent, CardFooter } from "@/components/ui/card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
-import { Heart, ArrowRight } from "lucide-react"
+import { Heart, ArrowUpRight } from "lucide-react"
 
 interface PostCardProps {
   post: Post
@@ -86,12 +86,12 @@ export default function PostCard({ post, variant = "list" }: PostCardProps) {
         </NavLink>
 
         {/* Resume */}
-        <p className={`line-clamp-3 text-muted-foreground ${isFeatured ? "mb-6" : "text-sm mb-3"}`}>
+        <p className={`line-clamp-3 text-muted-foreground ${isFeatured ? "mb-6" : "text-sm mb-4"}`}>
           {post.content.replace(/[#*]/g, "").trim().split("\n")[0]}
         </p>
 
         {/* Tags */}
-        <div className={`flex flex-wrap gap-2 ${isFeatured ? "mb-6" : "mb-3"}`}>
+        <div className={`flex flex-wrap gap-2 ${isFeatured ? "mb-6" : ""}`}>
           {post.hashtags.slice(0, 3).map((tag) => (
             <NavLink
               key={tag.id}
@@ -105,38 +105,57 @@ export default function PostCard({ post, variant = "list" }: PostCardProps) {
 
         {/* Featured footer */}
         {isFeatured && (
-          <CardFooter className="mt-auto p-0">
-            <Button asChild className="group">
-              <NavLink to={`/post/${post.slug}`}>
-                Read article
-                <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
-              </NavLink>
-            </Button>
+          <CardFooter className="flex justify-between items-center mt-auto p-0">
+            <LikeButton count={post.likes_count} />
+            <ReadCTA variant="article" slug={post.slug} />
           </CardFooter>
         )}
       </CardContent>
 
       {/* List footer */}
       {!isFeatured && (
-        <CardFooter className="flex justify-between items-center border-t p-6">
-          <Button
-            variant="ghost"
-            size="sm"
-            className="gap-1 text-muted-foreground hover:text-blue-500 cursor-not-allowed group"
-          >
-            <Heart
-              className="h-4 w-4 group-hover:fill-blue-200"
-            />
-            <span className="group-hover:text-blue-200">{post.likes_count}</span>
-          </Button>
-          <NavLink
-            to={`/post/${post.slug}`}
-            className="text-xs font-medium text-blue-500 hover:underline underline-offset-4"
-          >
-            Read more
-          </NavLink>
+        <CardFooter className="flex justify-between items-center border-t p-4">
+          <LikeButton count={post.likes_count} />
+          <ReadCTA variant="more" slug={post.slug} />
         </CardFooter>
       )}
     </Card>
+  )
+}
+
+function LikeButton({ count }: { count: number }) {
+  return (
+    <Button
+      variant="ghost"
+      size="sm"
+      className="gap-1 text-muted-foreground hover:text-blue-500 cursor-not-allowed group"
+      aria-label={`Likes: ${count}`}
+    >
+      <Heart className="h-3 w-3 group-hover:fill-blue-200" />
+      <span className="group-hover:text-blue-200">{count}</span>
+    </Button>
+  )
+}
+
+function ReadCTA({ variant, slug }: { variant: "article" | "more"; slug: string }) {
+  if (variant === "article") {
+    return (
+      <Button asChild className="group">
+        <NavLink to={`/post/${slug}`}>
+          Read article
+          <ArrowUpRight className="ml-2 h-4 w-4 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
+        </NavLink>
+      </Button>
+    )
+  }
+
+  return (
+    <NavLink
+      to={`/post/${slug}`}
+      className="text-sm font-medium text-blue-500 hover:text-violet-700/80 flex items-center gap-1 group"
+    >
+      Read more
+      <ArrowUpRight className="h-3.5 w-3.5 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+    </NavLink>
   )
 }
