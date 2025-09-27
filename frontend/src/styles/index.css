@@ -22,7 +22,7 @@
   --destructive: oklch(0.704 0.191 22.216);
   --border: theme(--color-slate-800);
   --input: theme(--color-slate-800);
-  --ring: oklch(0.556 0 0);
+  --ring: theme(--color-blue-500);
   --chart-1: oklch(0.488 0.243 264.376);
   --chart-2: oklch(0.696 0.17 162.48);
   --chart-3: oklch(0.769 0.188 70.08);
