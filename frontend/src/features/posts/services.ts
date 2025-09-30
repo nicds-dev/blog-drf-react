@@ -1,9 +1,8 @@
-import api from "@/services/api"
-import type { Post } from "@/types/post"
-import type { Category } from "@/types/post"
+import { publicApi } from "@/services/api"
+import type { Post, Category } from "@/types/post"
 
 export const getFeaturedPost = async (): Promise<Post> => {
-  const response = await api.get("/posts/featured/")
+  const response = await publicApi.get("/posts/featured/")
   return response.data
 }
 
@@ -22,11 +21,11 @@ export const getPosts = async (
 
   const url = `/posts/${params.toString() ? `?${params.toString()}` : ""}`
 
-  const response = await api.get(url)
+  const response = await publicApi.get(url)
   return response.data.results ?? response.data // paginación futura
 }
 
 export const getCategories = async (): Promise<Category[]> =>{
-  const response = await api.get("/posts/categories/")
+  const response = await publicApi.get("/posts/categories/")
   return response.data
 }
