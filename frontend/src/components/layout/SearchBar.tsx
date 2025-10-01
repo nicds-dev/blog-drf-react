@@ -28,7 +28,7 @@ export default function SearchBar() {
       <Input
         type="search"
         placeholder="Search posts..."
-        className="w-[200px] lg:w-[300px]"
+        className="w-[200px] lg:w-[300px] border-0 shadow-[0_1px_3px_#0000004d]"
         value={searchQuery}
         onChange={(e) => setSearchQuery(e.target.value)}
       />

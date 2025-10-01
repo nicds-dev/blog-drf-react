@@ -1,20 +1,33 @@
-import { NavLink } from "react-router-dom"
+import { NavLink, useNavigate } from "react-router-dom"
 import { Button } from "@/components/ui/button"
+import {
+  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger
+} from "@/components/ui/dropdown-menu"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { PlusSquare, User } from "lucide-react"
 import NavLinks from "@/components/layout/NavLinks"
 import SearchBar from "@/components/layout/SearchBar"
-
-interface User {
-  name: string
-  username: string
-  avatar?: string
-}
+import { useAuth } from "@/features/auth/useAuth"
+import { useState } from "react"
 
 export default function Navbar() {
-  const user = null
+  const { isAuthenticated, logoutUser } = useAuth()
+  const [ isLoggingOut, setIsLoggingOut ] = useState(false)
+  const navigate = useNavigate()
+
+  const handleLogout = async () => {
+    setIsLoggingOut(true)
+    try{
+      await logoutUser()
+      await new Promise(resolve => setTimeout(resolve, 50))
+      navigate("/", {replace: true})
+    } finally {
+      setIsLoggingOut(false)
+    }
+  }
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background/50 backdrop-blur-sm ">
+    <header className="sticky top-0 z-50 w-full border-b bg-zinc-950/15 backdrop-blur-[6px] ">
       <div className="max-w-8xl mx-auto px-8 flex h-16 items-center justify-between">
         <div className="flex items-center gap-6 md:gap-10">
           <NavLink to="/" className="font-bold text-xl md:text-2xl">
@@ -25,38 +38,42 @@ export default function Navbar() {
         <div className="flex items-center gap-4">
           <SearchBar />
 
-          {user ? (
+          {isAuthenticated ? (
             <>
-              <Button variant="ghost" size="icon" asChild className="hidden md:flex rounded-full hover:bg-primary/10">
+              <Button variant="ghost" size="icon" asChild className="h-10 w-10 hidden rounded-full md:flex dark:hover:bg-blue-500/10">
                 <NavLink to="/create">
                   <PlusSquare className="h-5 w-5" />
                   <span className="sr-only">Create Post</span>
                 </NavLink>
               </Button>
 
-              <div className="relative">
-                <Button variant="ghost" className="relative h-10 w-10 rounded-full">
-                  <div className="h-10 w-10 border-2 border-primary/10 rounded-full overflow-hidden">
-                    <img
-                      src={user.avatar || "/placeholder-avatar.jpg"}
-                      alt={user.name}
-                      className="h-full w-full object-cover"
-                    />
-                  </div>
-                </Button>
-                <div className="absolute right-0 mt-2 bg-white rounded-lg shadow-lg w-48">
-                  <NavLink to={`/profile/${user.username}`} className="block px-4 py-2 text-sm text-gray-800 hover:bg-gray-200">Profile</NavLink>
-                  <NavLink to="/settings" className="block px-4 py-2 text-sm text-gray-800 hover:bg-gray-200">Settings</NavLink>
-                  <hr />
-                  <NavLink
-                    to="#"
-                    onClick={() => alert("Logging out...")}
-                    className="block px-4 py-2 text-sm text-gray-800 hover:bg-gray-200"
-                  >
-                    Log out
-                  </NavLink>
-                </div>
-              </div>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="relative h-10 w-10 rounded-full">
+                    <Avatar className="h-10 w-10 border-2 border-primary/10">
+                      <AvatarImage
+                        src={"/placeholder-avatar.jpg"}
+                        alt="User Avatar"
+                      />
+                      <AvatarFallback className="bg-white">
+                        <User className="h-5 w-5 text-black" />
+                      </AvatarFallback>
+                    </Avatar>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="border-0">
+                  <DropdownMenuItem>
+                    <NavLink to="/profile/username" className="">Profile</NavLink>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem>
+                    <NavLink to="/settings" className="">Settings</NavLink>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={handleLogout} disabled={isLoggingOut}>
+                    {isLoggingOut ? "Logging out..." : "Log out"}
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </>
           ) : (
             <div className="hidden md:flex gap-2">

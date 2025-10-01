@@ -13,7 +13,7 @@ export default function NavLinks() {
           key={item.to}
           to={item.to}
           className={({ isActive }) =>
-            `hover:text-blue-500 transition-all duration-300 relative group ${
+            `text-sm hover:text-blue-500 transition-all duration-300 relative group ${
               isActive ? "text-blue-500" : "text-muted-foreground"
             }`
           }

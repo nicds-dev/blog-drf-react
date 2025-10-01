@@ -7,16 +7,7 @@ export default function MainLayout() {
     <div>
       <Navbar />
       <Outlet />
-      <Toaster 
-        toastOptions={{
-          duration: 4000,
-          classNames: {
-            toast: "!bg-slate-900 !text-foreground !border !border-border",
-            description: "text-foreground/90",
-            title: "text-foreground",
-          }
-        }}
-      />
+      <Toaster />
     </div>
   )
 }

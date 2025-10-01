@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { NavLink, useNavigate } from "react-router-dom"
+import { NavLink, useNavigate, useLocation } from "react-router-dom"
 import { useAuth } from "@/features/auth/useAuth"
 import FormField from "./FormField"
 import { Button } from "@/components/ui/button"
@@ -8,6 +8,8 @@ import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/componen
 export default function LoginPage() {
   const { loginUser } = useAuth()
   const navigate = useNavigate()
+  const location = useLocation()
+
   const [formData, setFormData] = useState({ username: "", password: "" })
   const [loading, setLoading] = useState(false)
 
@@ -20,7 +22,10 @@ export default function LoginPage() {
     setLoading(true)
     try {
       await loginUser({ ...formData, username: formData.username.toLowerCase() })
-      navigate("/")
+      await new Promise(resolve => setTimeout(resolve, 50))
+
+      const from = location.state?.from?.pathname || "/"
+      navigate(from, { replace: true }) // Redirect to the page user intended to visit or home
     } finally {
       setLoading(false)
     }
