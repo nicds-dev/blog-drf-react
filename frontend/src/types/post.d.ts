@@ -30,3 +30,9 @@ export interface Post {
   is_liked?: boolean
   created_at: string
 }
+
+export interface ToggleLike {
+  detail: string
+  is_liked: boolean
+  likes_count: number
+}

@@ -2,7 +2,12 @@ import { useState, useEffect } from "react"
 import { getPosts } from "@/features/posts/services"
 import type { Post } from "@/types/post"
 
-export function usePosts(category: string, search: string) {
+export function usePosts(filters: {
+  category?: string
+  author?: string
+  hashtag?: string
+  title?: string
+}) {
   const [posts, setPosts] = useState<Post[]>([])
   const [loading, setLoading] = useState<boolean>(true)
   const [error, setError] = useState<string | null>(null)
@@ -12,7 +17,7 @@ export function usePosts(category: string, search: string) {
       setLoading(true)
       setError(null)
       try {
-        const data = await getPosts(category, search)
+        const data = await getPosts(filters)
         setPosts(data)
       } catch (err) {
         setError("Oops! Something went wrong. Please try reloading the page or come back later.")
@@ -22,7 +27,7 @@ export function usePosts(category: string, search: string) {
     }
     
     fetchPosts()
-  }, [category, search])
+  }, [filters.category, filters.author, filters.hashtag, filters.title])
 
   return { posts, loading, error }
 }

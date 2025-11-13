@@ -1,9 +1,12 @@
-import { NavLink } from "react-router-dom"
+import { Link } from "react-router-dom"
 import type { Post } from "@/types/post"
 import { Card, CardContent, CardFooter } from "@/components/ui/card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
-import { Heart, ArrowUpRight } from "lucide-react"
+import { ArrowUpRight } from "lucide-react"
+import { LikeButton } from "./LikeButton"
+import ReactMarkdown from "react-markdown"
+import { useAuth } from "@/features/auth/useAuth"
 
 interface PostCardProps {
   post: Post
@@ -11,6 +14,7 @@ interface PostCardProps {
 }
 
 export default function PostCard({ post, variant = "list" }: PostCardProps) {
+  const { isAuthenticated } = useAuth()
 
   const formattedDate = new Date(post.created_at).toLocaleDateString("en-US", {
     year: "numeric",
@@ -21,12 +25,10 @@ export default function PostCard({ post, variant = "list" }: PostCardProps) {
   const isFeatured = variant === "featured"
 
   return (
-    <Card
-      className={`overflow-hidden flex flex-col h-full p-0 gap-0 ${isFeatured ? "md:flex-row border-0" : "border"}`}
-    >
+    <Card className={`overflow-hidden flex flex-col h-full p-0 gap-0 ${isFeatured ? "md:flex-row border-0" : "border"}`}>
       {/* Image */}
       <div className={`relative overflow-hidden ${isFeatured && "md:w-1/2"}`}>
-        <NavLink
+        <Link
         to={`/post/${post.slug}`}
         className={`${isFeatured ? "md:w-1/2 aspect-[16/9]" : "aspect-[16/9]"}`}
         >
@@ -35,16 +37,16 @@ export default function PostCard({ post, variant = "list" }: PostCardProps) {
             alt={post.title}
             className="object-cover w-full h-full transition-transform hover:scale-105 duration-500"
           />
-        </NavLink>
+        </Link>
 
         {post.category && (
           <div className="absolute top-3 left-3">
-            <NavLink
+            <Link
               to={`/explore/${post.category.slug}`}
-              className="tag-badge bg-black/50 backdrop-blur-sm hover:bg-blue-500 transition-colors"
+              className="tag-badge bg-slate-900/50 backdrop-blur-sm hover:bg-blue-500/50 transition-colors"
             >
               {post.category.name}
-            </NavLink>
+            </Link>
           </div>
         )}
       </div>
@@ -53,10 +55,10 @@ export default function PostCard({ post, variant = "list" }: PostCardProps) {
       <CardContent className={`flex flex-col flex-1 ${isFeatured ? "p-6 md:p-8 md:w-1/2" : "p-6"}`}>
         {/* Author */}
         <div className={`flex items-center gap-2 ${isFeatured ? "mb-6" : "mb-3"}`}>
-          <NavLink to={`/profile/${post.author.username}`} className="flex items-center gap-2 group">
+          <Link to={`/profile/${post.author.username}`} className="flex items-center gap-2 group">
             <Avatar className={isFeatured ? "h-8 w-8" : "h-6 w-6"}>
               <AvatarImage src={post.author.avatar || "/placeholder.svg"} alt={post.author.username} />
-              <AvatarFallback>{post.author.username.charAt(0)}</AvatarFallback>
+              <AvatarFallback className="font-bold text-blue-500">{post.author.full_name.charAt(0).toLowerCase()}</AvatarFallback>
             </Avatar>
             <div>
               <span className="text-sm font-medium group-hover:text-blue-500 transition-colors">
@@ -66,7 +68,7 @@ export default function PostCard({ post, variant = "list" }: PostCardProps) {
                 <p className="text-xs text-muted-foreground">{formattedDate}</p>
               )}
             </div>
-          </NavLink>
+          </Link>
           {!isFeatured && (
             <>
               <span className="text-xs text-muted-foreground">•</span>
@@ -76,37 +78,51 @@ export default function PostCard({ post, variant = "list" }: PostCardProps) {
         </div>
 
         {/* Title */}
-        <NavLink to={`/post/${post.slug}`} className="block group">
-          <h3
-            className={`font-semibold line-clamp-2 group-hover:text-blue-500 transition-colors mb-2
-              ${isFeatured ? "text-2xl md:text-3xl" : "text-lg"}`}
-          >
-            {post.title}
-          </h3>
-        </NavLink>
+        <div className="min-h-[2.5lh]">
+          <Link to={`/post/${post.slug}`} className="block group">
+            <h3
+              className={`font-semibold line-clamp-2 group-hover:text-blue-500 transition-colors
+              ${isFeatured ? "text-2xl md:text-3xl mb-4" : "text-lg mb-2"}`}
+            >
+              {post.title}
+            </h3>
+          </Link>
+        </div>
 
         {/* Resume */}
-        <p className={`line-clamp-3 text-muted-foreground ${isFeatured ? "mb-6" : "text-sm mb-4"}`}>
-          {post.content.replace(/[#*]/g, "").trim().split("\n")[0]}
-        </p>
+        <div
+          className={`line-clamp-3 text-muted-foreground ${
+            isFeatured ? "mb-6" : "text-sm mb-4"
+          }`}
+        >
+          <ReactMarkdown>
+            {post.content}
+          </ReactMarkdown>
+        </div>
+
 
         {/* Tags */}
-        <div className={`flex flex-wrap gap-2 ${isFeatured ? "mb-6" : ""}`}>
+        <div className={`flex flex-wrap gap-2 ${isFeatured ? "mb-6" : "mt-auto"}`}>
           {post.hashtags.slice(0, 3).map((tag) => (
-            <NavLink
+            <Link
               key={tag.id}
-              to={`/search?q=${encodeURIComponent(tag.name)}`}
+              to={`/explore?hashtag=${encodeURIComponent(tag.name)}`}
               className="tag-badge bg-slate-800 hover:bg-primary/10 text-muted-foreground hover:text-blue-500 transition-colors"
             >
               #{tag.name}
-            </NavLink>
+            </Link>
           ))}
         </div>
 
         {/* Featured footer */}
         {isFeatured && (
           <CardFooter className="flex justify-between items-center mt-auto p-0">
-            <LikeButton count={post.likes_count} />
+            <LikeButton
+              slug={post.slug}
+              initialLikes={post.likes_count}
+              initiallyLiked={post.is_liked}
+              isAuthenticated={isAuthenticated}
+            />
             <ReadCTA variant="article" slug={post.slug} />
           </CardFooter>
         )}
@@ -115,7 +131,12 @@ export default function PostCard({ post, variant = "list" }: PostCardProps) {
       {/* List footer */}
       {!isFeatured && (
         <CardFooter className="flex justify-between items-center border-t p-4">
-          <LikeButton count={post.likes_count} />
+          <LikeButton
+            slug={post.slug}
+            initialLikes={post.likes_count}
+            initiallyLiked={post.is_liked}
+            isAuthenticated={isAuthenticated}
+          />
           <ReadCTA variant="more" slug={post.slug} />
         </CardFooter>
       )}
@@ -123,39 +144,25 @@ export default function PostCard({ post, variant = "list" }: PostCardProps) {
   )
 }
 
-function LikeButton({ count }: { count: number }) {
-  return (
-    <Button
-      variant="ghost"
-      size="sm"
-      className="gap-1 text-muted-foreground hover:text-blue-500 cursor-not-allowed group"
-      aria-label={`Likes: ${count}`}
-    >
-      <Heart className="h-3 w-3 group-hover:fill-blue-200" />
-      <span className="group-hover:text-blue-200">{count}</span>
-    </Button>
-  )
-}
-
 function ReadCTA({ variant, slug }: { variant: "article" | "more"; slug: string }) {
   if (variant === "article") {
     return (
       <Button asChild className="group">
-        <NavLink to={`/post/${slug}`}>
+        <Link to={`/post/${slug}`}>
           Read article
           <ArrowUpRight className="ml-2 h-4 w-4 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
-        </NavLink>
+        </Link>
       </Button>
     )
   }
 
   return (
-    <NavLink
+    <Link
       to={`/post/${slug}`}
-      className="text-sm font-medium text-blue-500 hover:text-violet-700/80 flex items-center gap-1 group"
+      className="text-sm font-medium text-blue-500 hover:text-violet-500 flex items-center gap-1 group"
     >
       Read more
       <ArrowUpRight className="h-3.5 w-3.5 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
-    </NavLink>
+    </Link>
   )
 }

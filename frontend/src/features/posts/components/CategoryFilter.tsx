@@ -20,7 +20,7 @@ export default function CategoryFilter ({ setCategory, currentCategory }: Catego
       {categories.map((category => (
         <Button
           key={category.slug}
-          variant={currentCategory === category.slug ? "secondary" : "outline"}
+          variant={currentCategory === category.slug ? "default" : "outline"}
           className="rounded-full"
           onClick={() => setCategory(category.slug)}
         >

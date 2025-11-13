@@ -9,9 +9,15 @@ export default function PostList({ posts }: PostListProps) {
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      {posts.map((post) => (
-        <PostCard key={post.id} post={post} variant="list" />
-      ))}
+      {posts.length === 0 ? (
+        <p className="text-muted-foreground text-center col-span-full">
+          No posts available yet.
+        </p>
+      ) : (
+        posts.map((post) => (
+          <PostCard key={post.id} post={post} variant="list" />
+        ))
+      )}
     </div>
 )
 }

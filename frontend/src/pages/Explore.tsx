@@ -11,9 +11,14 @@ export default function ExplorePage() {
 
   const params = new URLSearchParams(location.search)
   const search = params.get("search") || ""
+  const hashtag = params.get("hashtag") || ""
 
   const currentCategory = category  || "all"
-  const { posts, loading, error } = usePosts(currentCategory, search)
+  const { posts, loading, error } = usePosts({
+    category: currentCategory,
+    hashtag,
+    title: search
+  })
 
   const handleCategoryChange = (newCategory: string) => {
     if (newCategory === "all") {
