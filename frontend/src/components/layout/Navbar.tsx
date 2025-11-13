@@ -1,4 +1,4 @@
-import { NavLink, useNavigate } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 import { Button } from "@/components/ui/button"
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger
@@ -19,7 +19,7 @@ export default function Navbar() {
     setIsLoggingOut(true)
     try{
       await logoutUser()
-      await new Promise(resolve => setTimeout(resolve, 50))
+      await new Promise(resolve => setTimeout(resolve, 10))  // todo: remove this line after fixing logout redirect issue
       navigate("/", {replace: true})
     } finally {
       setIsLoggingOut(false)
@@ -27,12 +27,12 @@ export default function Navbar() {
   }
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-zinc-950/15 backdrop-blur-[6px] ">
+    <header className="sticky top-0 z-50 w-full border-b bg-slate-950/35 backdrop-blur-[6px] ">
       <div className="max-w-8xl mx-auto px-8 flex h-16 items-center justify-between">
         <div className="flex items-center gap-6 md:gap-10">
-          <NavLink to="/" className="font-bold text-xl md:text-2xl">
-            Simple<span className="text-blue-500">Blog</span>
-          </NavLink>
+          <Link to="/" className="font-bold text-xl md:text-2xl">
+            Simple<span className="text-gradient">Blog</span>
+          </Link>
           <NavLinks />
         </div>
         <div className="flex items-center gap-4">
@@ -41,10 +41,10 @@ export default function Navbar() {
           {isAuthenticated ? (
             <>
               <Button variant="ghost" size="icon" asChild className="h-10 w-10 hidden rounded-full md:flex dark:hover:bg-blue-500/10">
-                <NavLink to="/create">
+                <Link to="/create">
                   <PlusSquare className="h-5 w-5" />
                   <span className="sr-only">Create Post</span>
-                </NavLink>
+                </Link>
               </Button>
 
               <DropdownMenu>
@@ -53,7 +53,7 @@ export default function Navbar() {
                     <Avatar className="h-10 w-10 border-2 border-primary/10">
                       <AvatarImage
                         src={"/placeholder-avatar.jpg"}
-                        alt="User Avatar"
+                        alt="User profile avatar"
                       />
                       <AvatarFallback className="bg-white">
                         <User className="h-5 w-5 text-black" />
@@ -62,14 +62,14 @@ export default function Navbar() {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="border-0">
-                  <DropdownMenuItem>
-                    <NavLink to="/profile/username" className="">Profile</NavLink>
+                  <DropdownMenuItem asChild className="cursor-pointer">
+                    <Link to="/profile/username">Profile</Link>
                   </DropdownMenuItem>
-                  <DropdownMenuItem>
-                    <NavLink to="/settings" className="">Settings</NavLink>
+                  <DropdownMenuItem asChild className="cursor-pointer">
+                    <Link to="/settings">Settings</Link>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={handleLogout} disabled={isLoggingOut}>
+                  <DropdownMenuItem onClick={handleLogout} disabled={isLoggingOut} className="cursor-pointer">
                     {isLoggingOut ? "Logging out..." : "Log out"}
                   </DropdownMenuItem>
                 </DropdownMenuContent>
@@ -77,12 +77,12 @@ export default function Navbar() {
             </>
           ) : (
             <div className="hidden md:flex gap-2">
-              <Button variant="ghost">
-                <NavLink to="/login">Log in</NavLink>
-              </Button>
-              <Button>
-                <NavLink to="/signup">Sign up</NavLink>
-              </Button>
+              <Link to="/login">
+                <Button variant="ghost">Log in</Button>
+              </Link>
+              <Link to="/signup">
+                <Button>Sign up</Button>
+              </Link>
             </div>
           )}
         </div>

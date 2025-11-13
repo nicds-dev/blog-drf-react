@@ -1,8 +1,8 @@
 import api, { publicApi, refreshClient } from "@/services/api"
 import { getRefreshToken } from "@/lib/tokens"
-import type { SignUpData, LoginData, TokenResponse, UserProfile } from "@/types/auth"
+import type { SignUpData, LoginData, TokenResponse, RegisteredUser } from "@/types/auth"
 
-export const signUpApi = async (data: SignUpData): Promise<UserProfile> => {
+export const signUpApi = async (data: SignUpData): Promise<RegisteredUser> => {
   const response = await api.post("/users/signup/", data)
   return response.data
 }

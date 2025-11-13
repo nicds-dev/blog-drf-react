@@ -13,7 +13,7 @@ export default function FeaturedPost() {
   if (!featured) return null 
 
   return (
-    <section className="py-16 bg-[#0F1625]">
+    <section className="py-16 bg-[#0c1027]">
       <div className="my-container">
         <div className="mx-auto mb-8 text-center">
           <h2 className="text-3xl font-bold mb-2 text-white">Featured Post</h2>
